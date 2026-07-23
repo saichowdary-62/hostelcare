@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint Management · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="admin-shell">
+
+  <aside class="admin-sidebar">
+    <div class="brand"><span class="brand-name">Aditya University</span></div>
+    <nav class="admin-nav">
+      <div class="nav-label">Overview</div>
+      <a href="admin-dashboard.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+        Dashboard
+      </a>
+      <a href="admin-complaints.html" class="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Complaints
+      </a>
+      <div class="nav-label">Insights</div>
+      <a href="admin-dashboard.html#analytics">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20V10m6 10V4m6 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Analytics
+      </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button class="btn btn-danger-outline btn-block btn-sm" id="logoutBtnDesktop">Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-drawer-overlay"></div>
+  <aside class="admin-drawer">
+    <div class="brand"><span class="brand-name">Aditya University</span></div>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+        Dashboard
+      </a>
+      <a href="admin-complaints.html" class="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Complaints
+      </a>
+      <a href="admin-dashboard.html#analytics">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20V10m6 10V4m6 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Analytics
+      </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button class="btn btn-danger-outline btn-block btn-sm" id="logoutBtnMobile">Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="page-title">Complaint Management</div>
+      <button class="avatar-btn" id="avatarBtn">W</button>
+    </header>
+
+    <main class="page-content">
+      <div class="toolbar">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="text" id="searchInput" placeholder="Search by ID, student, hostel, room...">
+        </div>
+        <div class="filter-group">
+          <select id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Under Repair">Under Repair</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <select id="hostelFilter">
+            <option value="">All Hostels</option>
+          </select>
+          <select id="categoryFilter">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Desktop table -->
+      <div class="table-wrap table-desktop-only">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Complaint ID</th><th>Student ID</th><th>Hostel</th><th>Room</th>
+              <th>Category</th><th>Date</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+      <!-- Mobile cards -->
+      <div class="table-mobile-cards" id="mobileCards"></div>
+      <div class="pagination hide-desktop" id="paginationMobile" style="border-top:none; padding:var(--space-4) 0;"></div>
+
+      <div id="emptyState" class="card empty-state" style="display:none;">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <h3>No complaints found</h3>
+        <p>Try adjusting your search or filters.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+<script>
+  HC.requireWarden();
+  const PAGE_SIZE = 6;
+  let currentPage = 1;
+  let allComplaints = HC.getComplaints().sort((a,b) => b.createdAt - a.createdAt);
+
+  const hostelFilter = document.getElementById("hostelFilter");
+  HC.HOSTELS.forEach(h => { const o = document.createElement("option"); o.value = h; o.textContent = h; hostelFilter.appendChild(o); });
+  const categoryFilter = document.getElementById("categoryFilter");
+  HC.CATEGORIES.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; categoryFilter.appendChild(o); });
+
+  function getFiltered() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const status = document.getElementById("statusFilter").value;
+    const hostel = hostelFilter.value;
+    const category = categoryFilter.value;
+    return allComplaints.filter(c => {
+      const matchesQ = !q || c.id.toLowerCase().includes(q) || c.studentId.toLowerCase().includes(q) ||
+        c.studentName.toLowerCase().includes(q) || c.room.toLowerCase().includes(q) || c.hostel.toLowerCase().includes(q);
+      return matchesQ && (!status || c.status === status) && (!hostel || c.hostel === hostel) && (!category || c.category === category);
+    });
+  }
+
+  function actionButtons(c) {
+    let html = `<a href="admin-complaint-details.html?id=${c.id}" class="btn btn-ghost btn-sm">View</a>`;
+    if (c.status === "Pending") {
+      html += `<button class="btn btn-secondary btn-sm" onclick="quickUpdate('${c.id}','Under Repair')">Mark Under Repair</button>`;
+    }
+    if (c.status === "Under Repair") {
+      html += `<button class="btn btn-success btn-sm" onclick="quickUpdate('${c.id}','Completed')">Mark Completed</button>`;
+    }
+    return html;
+  }
+
+  function render() {
+    const filtered = getFiltered();
+    const emptyEl = document.getElementById("emptyState");
+    const tableBody = document.getElementById("tableBody");
+    const mobileCards = document.getElementById("mobileCards");
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML = "";
+      mobileCards.innerHTML = "";
+      document.getElementById("pagination").innerHTML = "";
+      document.getElementById("paginationMobile").innerHTML = "";
+      emptyEl.style.display = "block";
+      return;
+    }
+    emptyEl.style.display = "none";
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+    tableBody.innerHTML = pageItems.map(c => `
+      <tr>
+        <td class="cell-id">${c.id}</td>
+        <td>${HC.escapeHtml(c.studentId)}</td>
+        <td>${HC.escapeHtml(c.hostel)}</td>
+        <td>${HC.escapeHtml(c.room)}</td>
+        <td>${HC.escapeHtml(c.category)}</td>
+        <td>${HC.formatDate(c.createdAt)}</td>
+        <td><span class="badge ${HC.badgeClass(c.status)}">${c.status}</span></td>
+        <td class="cell-actions">${actionButtons(c)}</td>
+      </tr>
+    `).join("");
+
+    mobileCards.innerHTML = pageItems.map(c => `
+      <div class="complaint-card">
+        <div class="complaint-card-top">
+          <div>
+            <div class="complaint-card-id">${c.id} · ${HC.escapeHtml(c.studentId)}</div>
+            <div class="complaint-card-title">${HC.escapeHtml(c.category)}</div>
+          </div>
+          <span class="badge ${HC.badgeClass(c.status)}">${c.status}</span>
+        </div>
+        <div class="complaint-card-meta">
+          <span>${HC.escapeHtml(c.hostel)} · Room ${HC.escapeHtml(c.room)}</span>
+          <span>${HC.formatDate(c.createdAt)}</span>
+        </div>
+        <div class="complaint-card-footer" style="flex-wrap:wrap; gap:8px;">
+          ${actionButtons(c)}
+        </div>
+      </div>
+    `).join("");
+
+    const paginationHtml = (idPrefix) => `
+      <span>Page ${currentPage} of ${totalPages} · ${filtered.length} results</span>
+      <div class="pagination-controls">
+        <button ${currentPage === 1 ? "disabled" : ""} onclick="goToPage(${currentPage - 1})">‹</button>
+        ${Array.from({length: totalPages}, (_, i) => i + 1).map(p => `
+          <button class="${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>
+        `).join("")}
+        <button ${currentPage === totalPages ? "disabled" : ""} onclick="goToPage(${currentPage + 1})">›</button>
+      </div>
+    `;
+    document.getElementById("pagination").innerHTML = paginationHtml();
+    document.getElementById("paginationMobile").innerHTML = paginationHtml();
+  }
+
+  function goToPage(p) { currentPage = p; render(); }
+  function quickUpdate(id, status) {
+    HC.updateComplaintStatus(id, status);
+    allComplaints = HC.getComplaints().sort((a,b) => b.createdAt - a.createdAt);
+    HC.toast(`${id} marked as ${status}`);
+    render();
+  }
+
+  ["searchInput"].forEach(id => document.getElementById(id).addEventListener("input", () => { currentPage = 1; render(); }));
+  ["statusFilter", "hostelFilter", "categoryFilter"].forEach(id => document.getElementById(id).addEventListener("change", () => { currentPage = 1; render(); }));
+
+  render();
+  document.getElementById("logoutBtnDesktop").addEventListener("click", () => HC.logout("admin-login.html"));
+  document.getElementById("logoutBtnMobile").addEventListener("click", () => HC.logout("admin-login.html"));
+</script>
+</body>
+</html>

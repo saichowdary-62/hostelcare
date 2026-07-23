@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint Details · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="admin-shell">
+
+  <aside class="admin-sidebar">
+    <div class="brand"><span class="brand-name">Aditya University</span></div>
+    <nav class="admin-nav">
+      <div class="nav-label">Overview</div>
+      <a href="admin-dashboard.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+        Dashboard
+      </a>
+      <a href="admin-complaints.html" class="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Complaints
+      </a>
+      <div class="nav-label">Insights</div>
+      <a href="admin-dashboard.html#analytics">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20V10m6 10V4m6 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Analytics
+      </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button class="btn btn-danger-outline btn-block btn-sm" id="logoutBtnDesktop">Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-drawer-overlay"></div>
+  <aside class="admin-drawer">
+    <div class="brand"><span class="brand-name">Aditya University</span></div>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+        Dashboard
+      </a>
+      <a href="admin-complaints.html" class="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Complaints
+      </a>
+      <a href="admin-dashboard.html#analytics">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20V10m6 10V4m6 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Analytics
+      </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button class="btn btn-danger-outline btn-block btn-sm" id="logoutBtnMobile">Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="page-title">Complaint Details</div>
+      <button class="avatar-btn" id="avatarBtn">W</button>
+    </header>
+
+    <main class="page-content" id="mainContent">
+      <a href="admin-complaints.html" class="back-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to Complaints
+      </a>
+
+      <div class="detail-header">
+        <div>
+          <div class="text-sm text-muted" id="cId">HC-0000</div>
+          <h2 style="font-size:20px; margin-top:2px;" id="cCategory">Category</h2>
+        </div>
+        <span class="badge" id="cStatusBadge">Status</span>
+      </div>
+
+      <div class="detail-grid">
+        <div>
+          <div class="card mb-4">
+            <h3 style="font-size:14px; margin-bottom:16px;">Complaint Information</h3>
+            <div class="info-list">
+              <div class="info-row"><span class="info-label">Student ID</span><span class="info-value" id="cStudentId">—</span></div>
+              <div class="info-row"><span class="info-label">Student Name</span><span class="info-value" id="cStudentName">—</span></div>
+              <div class="info-row"><span class="info-label">Hostel</span><span class="info-value" id="cHostel">—</span></div>
+              <div class="info-row"><span class="info-label">Block</span><span class="info-value" id="cBlock">—</span></div>
+              <div class="info-row"><span class="info-label">Floor</span><span class="info-value" id="cFloor">—</span></div>
+              <div class="info-row"><span class="info-label">Room Number</span><span class="info-value" id="cRoom">—</span></div>
+              <div class="info-row"><span class="info-label">Category</span><span class="info-value" id="cCategory2">—</span></div>
+              <div class="info-row"><span class="info-label">Date Submitted</span><span class="info-value" id="cDate">—</span></div>
+            </div>
+            <div style="margin-top:16px;">
+              <div class="text-sm text-muted mb-2" style="font-weight:600;">Description</div>
+              <p class="text-sm" id="cDescription" style="line-height:1.7;">—</p>
+            </div>
+            <div class="detail-image" id="cImageWrap" style="display:none;">
+              <img id="cImage" alt="Complaint photo">
+            </div>
+          </div>
+
+          <div class="card" id="actionsCard">
+            <h3 style="font-size:14px; margin-bottom:16px;">Update Status</h3>
+            <div class="flex gap-3" style="flex-wrap:wrap;" id="actionButtons"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3 style="font-size:14px; margin-bottom:20px;">Status Timeline</h3>
+            <div class="timeline" id="timeline"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Status update modal -->
+<div class="modal-overlay" id="statusModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Update Status</h3>
+    <p id="modalDesc">Confirm updating this complaint's status.</p>
+    <div class="field-group">
+      <label for="remarkInput">Remarks <span class="text-muted">(optional)</span></label>
+      <textarea id="remarkInput" placeholder="Add a note about this update..." style="min-height:80px;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+      <button class="btn btn-primary" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+<script>
+  HC.requireWarden();
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  let complaint = HC.getComplaints().find(c => c.id === id);
+  let pendingStatus = null;
+
+  function renderDetails() {
+    if (!complaint) {
+      document.getElementById("mainContent").innerHTML = `
+        <div class="card empty-state">
+          <h3>Complaint not found</h3>
+          <p>This complaint ID does not exist.</p>
+          <a href="admin-complaints.html" class="btn btn-primary btn-sm">Back to Complaints</a>
+        </div>`;
+      return;
+    }
+    document.getElementById("cId").textContent = complaint.id;
+    document.getElementById("cCategory").textContent = complaint.category;
+    document.getElementById("cCategory2").textContent = complaint.category;
+    const badge = document.getElementById("cStatusBadge");
+    badge.textContent = complaint.status;
+    badge.className = "badge " + HC.badgeClass(complaint.status);
+    document.getElementById("cStudentId").textContent = complaint.studentId;
+    document.getElementById("cStudentName").textContent = complaint.studentName;
+    document.getElementById("cHostel").textContent = complaint.hostel;
+    document.getElementById("cBlock").textContent = complaint.block;
+    document.getElementById("cFloor").textContent = complaint.floor;
+    document.getElementById("cRoom").textContent = complaint.room;
+    document.getElementById("cDate").textContent = HC.formatDate(complaint.createdAt);
+    document.getElementById("cDescription").textContent = complaint.description;
+
+    if (complaint.image) {
+      document.getElementById("cImageWrap").style.display = "block";
+      document.getElementById("cImage").src = complaint.image;
+    }
+
+    const actionsCard = document.getElementById("actionsCard");
+    const actionButtons = document.getElementById("actionButtons");
+    if (complaint.status === "Completed") {
+      actionsCard.style.display = "none";
+    } else {
+      actionsCard.style.display = "block";
+      actionButtons.innerHTML = "";
+      if (complaint.status === "Pending") {
+        actionButtons.innerHTML += `<button class="btn btn-secondary" onclick="openModal('Under Repair')">Mark Under Repair</button>`;
+      }
+      if (complaint.status === "Under Repair") {
+        actionButtons.innerHTML += `<button class="btn btn-success" onclick="openModal('Completed')">Mark Completed</button>`;
+      }
+    }
+
+    const stages = ["Pending", "Under Repair", "Completed"];
+    const currentIndex = stages.indexOf(complaint.status);
+    document.getElementById("timeline").innerHTML = complaint.timeline.map((t, i) => {
+      const isCurrent = i === complaint.timeline.length - 1;
+      return `
+        <div class="timeline-item ${isCurrent ? 'is-current' : 'is-done'}">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">${t.status}</div>
+          <div class="timeline-date">${HC.formatDateTime(t.date)}</div>
+          <div class="timeline-remark">${HC.escapeHtml(t.remark)}</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function openModal(status) {
+    pendingStatus = status;
+    document.getElementById("modalTitle").textContent = `Mark as ${status}`;
+    document.getElementById("modalDesc").textContent = `This will update complaint ${complaint.id} to "${status}" and notify the student.`;
+    document.getElementById("remarkInput").value = "";
+    document.getElementById("statusModal").classList.add("open");
+  }
+  function closeModal() { document.getElementById("statusModal").classList.remove("open"); }
+
+  document.getElementById("modalCancel").addEventListener("click", closeModal);
+  document.getElementById("statusModal").addEventListener("click", (e) => { if (e.target.id === "statusModal") closeModal(); });
+  document.getElementById("modalConfirm").addEventListener("click", () => {
+    const remark = document.getElementById("remarkInput").value.trim();
+    HC.updateComplaintStatus(complaint.id, pendingStatus, remark || undefined);
+    complaint = HC.getComplaints().find(c => c.id === id);
+    closeModal();
+    HC.toast(`${complaint.id} marked as ${pendingStatus}`);
+    renderDetails();
+  });
+
+  renderDetails();
+  document.getElementById("logoutBtnDesktop").addEventListener("click", () => HC.logout("admin-login.html"));
+  document.getElementById("logoutBtnMobile").addEventListener("click", () => HC.logout("admin-login.html"));
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint Details · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topnav">
+    <div class="topnav-inner">
+      <div class="brand">
+        <span class="brand-name">Aditya University</span>
+      </div>
+      <nav class="topnav-links">
+        <a href="student-dashboard.html">Home</a>
+        <a href="create-complaint.html">Create Complaint</a>
+        <a href="complaints.html">My Complaints</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+      <div class="topnav-actions">
+        <button class="avatar-btn" id="avatarBtn" onclick="window.location.href='profile.html'">--</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <a href="complaints.html" class="back-link">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to My Complaints
+    </a>
+
+    <div class="detail-header">
+      <div>
+        <div class="text-sm text-muted" id="cId">HC-0000</div>
+        <h2 style="font-size:20px; margin-top:2px;" id="cCategory">Category</h2>
+      </div>
+      <span class="badge" id="cStatusBadge">Status</span>
+    </div>
+
+    <div class="detail-grid">
+      <div>
+        <div class="card mb-4">
+          <h3 style="font-size:14px; margin-bottom:16px;">Complaint Information</h3>
+          <div class="info-list">
+            <div class="info-row"><span class="info-label">Hostel</span><span class="info-value" id="cHostel">—</span></div>
+            <div class="info-row"><span class="info-label">Block</span><span class="info-value" id="cBlock">—</span></div>
+            <div class="info-row"><span class="info-label">Floor</span><span class="info-value" id="cFloor">—</span></div>
+            <div class="info-row"><span class="info-label">Room Number</span><span class="info-value" id="cRoom">—</span></div>
+            <div class="info-row"><span class="info-label">Category</span><span class="info-value" id="cCategory2">—</span></div>
+            <div class="info-row"><span class="info-label">Date Submitted</span><span class="info-value" id="cDate">—</span></div>
+          </div>
+          <div style="margin-top:16px;">
+            <div class="text-sm text-muted mb-2" style="font-weight:600;">Description</div>
+            <p class="text-sm" id="cDescription" style="line-height:1.7;">—</p>
+          </div>
+          <div class="detail-image" id="cImageWrap" style="display:none;">
+            <img id="cImage" alt="Complaint photo">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3 style="font-size:14px; margin-bottom:20px;">Status Timeline</h3>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="bottom-nav-spacer"></div>
+  <nav class="bottom-nav">
+    <a href="student-dashboard.html">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5H10v5a1 1 0 01-1 1H5a1 1 0 01-1-1v-9z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="create-complaint.html" class="fab-link">
+      <div class="fab-create">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <span>Create</span>
+    </a>
+    <a href="complaints.html" class="active">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Complaints</span>
+    </a>
+    <a href="profile.html">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+</div>
+
+<script src="js/script.js"></script>
+<script>
+  const session = HC.requireStudent();
+  if (session) {
+    const student = HC.getStudentById(session.studentId);
+    document.getElementById("avatarBtn").textContent = HC.initials(student.name);
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const complaint = HC.getComplaints().find(c => c.id === id && c.studentId === session.studentId);
+
+    if (!complaint) {
+      document.querySelector(".page-content").innerHTML = `
+        <div class="card empty-state">
+          <h3>Complaint not found</h3>
+          <p>This complaint doesn't exist or doesn't belong to your account.</p>
+          <a href="complaints.html" class="btn btn-primary btn-sm">Back to My Complaints</a>
+        </div>`;
+    } else {
+      document.getElementById("cId").textContent = complaint.id;
+      document.getElementById("cCategory").textContent = complaint.category;
+      document.getElementById("cCategory2").textContent = complaint.category;
+      document.getElementById("cStatusBadge").textContent = complaint.status;
+      document.getElementById("cStatusBadge").classList.add(HC.badgeClass(complaint.status));
+      document.getElementById("cHostel").textContent = complaint.hostel;
+      document.getElementById("cBlock").textContent = complaint.block;
+      document.getElementById("cFloor").textContent = complaint.floor;
+      document.getElementById("cRoom").textContent = complaint.room;
+      document.getElementById("cDate").textContent = HC.formatDate(complaint.createdAt);
+      document.getElementById("cDescription").textContent = complaint.description;
+
+      if (complaint.image) {
+        document.getElementById("cImageWrap").style.display = "block";
+        document.getElementById("cImage").src = complaint.image;
+      }
+
+      const stages = ["Pending", "Under Repair", "Completed"];
+      const currentIndex = stages.indexOf(complaint.status);
+      const timelineEl = document.getElementById("timeline");
+      timelineEl.innerHTML = complaint.timeline.map((t, i) => {
+        const stageIndex = stages.indexOf(t.status);
+        const isDone = stageIndex < currentIndex || complaint.status === "Completed";
+        const isCurrent = i === complaint.timeline.length - 1;
+        return `
+          <div class="timeline-item ${isCurrent ? 'is-current' : 'is-done'}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-title">${t.status}</div>
+            <div class="timeline-date">${HC.formatDateTime(t.date)}</div>
+            <div class="timeline-remark">${HC.escapeHtml(t.remark)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+</script>
+</body>
+</html>

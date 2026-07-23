@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hostel Management · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css">
+</head><body><div class="app">
+<header class="topnav"><div class="topnav-inner"><div class="brand"><span class="brand-name">Aditya University</span></div><nav class="topnav-links"><a href="admin-dashboard.html">Dashboard</a><a href="admin-complaints.html">Complaints</a><a class="active" href="admin-hostels.html">Hostels & Blocks</a></nav><div class="topnav-actions"><button class="btn btn-danger-outline btn-sm" id="logoutBtn">Logout</button></div></div></header>
+<main class="page-content">
+  <div class="welcome-card"><h1>Hostels & Blocks</h1><p>Add hostel names and the blocks available in each hostel.</p></div>
+  <div class="charts-grid" style="margin-top:24px">
+    <section class="card chart-card"><h3>Add Hostel</h3><form id="hostelForm"><div class="field-group"><label for="hostelName">Hostel Name</label><input id="hostelName" placeholder="e.g. Aditya New Hostel" required></div><button class="btn btn-primary" type="submit">Add Hostel</button></form></section>
+    <section class="card chart-card"><h3>Add Block</h3><form id="blockForm"><div class="field-group"><label for="hostelSelect">Hostel</label><select id="hostelSelect" required></select></div><div class="field-group"><label for="blockName">Block</label><input id="blockName" placeholder="e.g. H" maxlength="20" required></div><button class="btn btn-primary" type="submit">Add Block</button></form></section>
+  </div>
+  <div class="section-heading"><h2>Current Setup</h2></div><div id="hostelList" class="complaints-list"></div>
+</main></div>
+<script src="js/script.js"></script><script>
+if (HC.requireWarden()) {
+  const select = document.getElementById("hostelSelect"), list = document.getElementById("hostelList");
+  function render() {
+    select.innerHTML = HC.HOSTELS.map((hostel) => `<option value="${HC.escapeHtml(hostel)}">${HC.escapeHtml(hostel)}</option>`).join("");
+    list.innerHTML = HC.HOSTELS.map((hostel) => `<div class="complaint-card"><div class="complaint-card-top"><div><div class="complaint-card-title">${HC.escapeHtml(hostel)}</div><div class="complaint-card-meta"><span>${HC.getBlocksForHostel(hostel).length ? HC.getBlocksForHostel(hostel).map(HC.escapeHtml).join(", ") : "No blocks added"}</span></div></div></div></div>`).join("");
+  }
+  document.getElementById("hostelForm").addEventListener("submit", (event) => { event.preventDefault(); const result = HC.addHostel(document.getElementById("hostelName").value); if (!result.ok) return HC.toast(result.message); event.currentTarget.reset(); render(); HC.toast("Hostel added."); });
+  document.getElementById("blockForm").addEventListener("submit", (event) => { event.preventDefault(); const result = HC.addBlock(select.value, document.getElementById("blockName").value); if (!result.ok) return HC.toast(result.message); document.getElementById("blockName").value = ""; render(); HC.toast("Block added."); });
+  document.getElementById("logoutBtn").addEventListener("click", () => HC.logout("admin-login.html")); render();
+}
+</script></body></html>

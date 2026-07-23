@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Login · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <img class="university-logo" src="https://adityasabl.netlify.app/adityalogo.png" alt="Aditya University logo">
+      <div>
+        <div class="brand-name">Aditya University</div>
+        <div class="brand-sub">Complaint Management System</div>
+      </div>
+    </div>
+
+    <div class="auth-toggle">
+      <a href="index.html" class="active">Student</a>
+      <a href="admin-login.html">Warden</a>
+    </div>
+
+    <div class="auth-heading">
+      <h1>Welcome back</h1>
+      <p>Log in with your roll number to report and track repair requests.</p>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="field-group">
+        <label for="studentId">Roll Number</label>
+        <input type="text" id="studentId" name="studentId" placeholder="e.g. 22A91A0001" autocomplete="username" required>
+      </div>
+      <div class="field-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+    </form>
+
+    <p class="auth-create-link">New student? <a href="create-account.html">Create an account</a></p>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/script.js"></script>
+<script>
+  document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const studentId = document.getElementById("studentId").value;
+    const password = document.getElementById("password").value;
+    const result = await HC.loginStudent(studentId, password);
+    if (result.ok) {
+      window.location.href = "student-dashboard.html";
+    } else {
+      HC.toast(result.message);
+    }
+  });
+
+  // Redirect if already logged in
+  (function () {
+    HC.seedIfNeeded();
+    const s = HC.getSession();
+    if (s && s.role === "student") window.location.href = "student-dashboard.html";
+  })();
+</script>
+</body>
+</html>

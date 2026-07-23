@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warden Login · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <img class="university-logo" src="https://adityasabl.netlify.app/adityalogo.png" alt="Aditya University logo">
+      <div>
+        <div class="brand-name">Aditya University</div>
+        <div class="brand-sub">Complaint Management System</div>
+      </div>
+    </div>
+
+    <div class="auth-toggle">
+      <a href="index.html">Student</a>
+      <a href="admin-login.html" class="active">Warden</a>
+    </div>
+
+    <div class="auth-heading">
+      <h1>Warden Login</h1>
+      <p>Sign in to manage and resolve hostel maintenance complaints.</p>
+    </div>
+
+    <form id="adminLoginForm" novalidate>
+      <div class="field-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="e.g. warden" autocomplete="username" required>
+      </div>
+      <div class="field-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+    </form>
+
+    <div class="auth-demo-hint">
+      <strong>Demo access:</strong> Username <b>warden</b> · Password <b>admin123</b>
+    </div>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+<script>
+  document.getElementById("adminLoginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const result = HC.loginWarden(username, password);
+    if (result.ok) {
+      window.location.href = "admin-dashboard.html";
+    } else {
+      HC.toast(result.message);
+    }
+  });
+
+  (function () {
+    HC.seedIfNeeded();
+    const s = HC.getSession();
+    if (s && s.role === "warden") window.location.href = "admin-dashboard.html";
+  })();
+</script>
+</body>
+</html>

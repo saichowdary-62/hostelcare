@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css">
+</head><body><div class="auth-screen"><div class="auth-card">
+<div class="auth-brand"><img class="university-logo" src="https://adityasabl.netlify.app/adityalogo.png" alt="Aditya University logo"><div><div class="brand-name">Aditya University</div><div class="brand-sub">Complaint Management System</div></div></div>
+<div class="auth-heading"><h1>Create account</h1><p>Enter your details to get started.</p></div>
+<form id="signupForm" novalidate>
+<div class="field-group"><label for="rollNumber">Roll Number</label><input id="rollNumber" type="text" placeholder="e.g. 22A91A0001" required></div>
+<div class="field-group"><label for="name">Name</label><input id="name" type="text" placeholder="Enter your full name" autocomplete="name" required></div>
+<div class="field-group"><label for="email">Email</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email" required></div>
+<div class="field-group"><label for="password">Password</label><input id="password" type="password" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required></div>
+<button class="btn btn-primary btn-block" type="submit">Create Account</button></form>
+<div class="auth-demo-hint">Already have an account? <a href="index.html">Log in</a></div>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase-config.js"></script><script src="js/script.js"></script>
+<script>
+document.getElementById("signupForm").addEventListener("submit", async (event) => {
+  event.preventDefault(); const button = event.currentTarget.querySelector("button"); button.disabled = true;
+  const result = await HC.createStudentAccount({
+    rollNumber: document.getElementById("rollNumber").value,
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    password: document.getElementById("password").value
+  });
+  button.disabled = false; if (!result.ok) return HC.toast(result.message); HC.toast(result.message);
+  if (result.signedIn) window.location.href = "student-dashboard.html"; else setTimeout(() => window.location.href = "index.html", 1800);
+});
+</script></body></html>

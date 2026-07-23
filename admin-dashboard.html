@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warden Dashboard · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="admin-shell">
+
+  <!-- Desktop Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="brand"><span class="brand-name">Aditya University</span></div>
+    <nav class="admin-nav">
+      <div class="nav-label">Overview</div>
+      <a href="admin-dashboard.html" class="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+        Dashboard
+      </a>
+      <a href="admin-complaints.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Complaints
+      </a>
+      <a href="admin-hostels.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Hostels &amp; Blocks
+      </a>
+      <div class="nav-label">Insights</div>
+      <a href="admin-dashboard.html#analytics">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20V10m6 10V4m6 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Analytics
+      </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button class="btn btn-danger-outline btn-block btn-sm" id="logoutBtnDesktop">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile Drawer -->
+  <div class="admin-drawer-overlay"></div>
+  <aside class="admin-drawer">
+    <div class="brand"><span class="brand-name">Aditya University</span></div>
+    <nav class="admin-nav">
+      <a href="admin-dashboard.html" class="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+        Dashboard
+      </a>
+      <a href="admin-complaints.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Complaints
+      </a>
+      <a href="admin-hostels.html">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Hostels &amp; Blocks
+      </a>
+      <a href="admin-dashboard.html#analytics">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20V10m6 10V4m6 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Analytics
+      </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button class="btn btn-danger-outline btn-block btn-sm" id="logoutBtnMobile">Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="page-title">Dashboard</div>
+      <button class="avatar-btn" id="avatarBtn">W</button>
+    </header>
+
+    <main class="page-content">
+      <div class="welcome-card">
+        <h1>Welcome back, Warden</h1>
+        <p>Here's what's happening across all hostels today.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon tone-total"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-label">Total Complaints</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon tone-pending"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="stat-value" id="statPending">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon tone-progress"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v3m0 12v3m9-9h-3M6 12H3m14.5-6.5l-2 2M8.5 15.5l-2 2m0-11l2 2m9 9l-2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="stat-value" id="statProgress">0</div>
+          <div class="stat-label">Under Repair</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon tone-completed"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="stat-value" id="statCompleted">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+
+      <div class="charts-grid" id="analytics">
+        <div class="card chart-card">
+          <h3>Complaints by Category</h3>
+          <div class="bar-chart" id="barChart"></div>
+        </div>
+        <div class="card chart-card">
+          <h3>Status Breakdown</h3>
+          <div class="donut-wrap">
+            <svg width="150" height="150" viewBox="0 0 42 42" id="donutSvg"></svg>
+            <ul class="donut-legend" id="donutLegend"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-heading">
+        <h2>Recent Complaints</h2>
+        <a href="admin-complaints.html" class="link-more">View all</a>
+      </div>
+      <div id="recentList"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+<script>
+  HC.requireWarden();
+  const complaints = HC.getComplaints();
+
+  document.getElementById("statTotal").textContent = complaints.length;
+  document.getElementById("statPending").textContent = complaints.filter(c => c.status === "Pending").length;
+  document.getElementById("statProgress").textContent = complaints.filter(c => c.status === "Under Repair").length;
+  document.getElementById("statCompleted").textContent = complaints.filter(c => c.status === "Completed").length;
+
+  // Bar chart: complaints by category
+  const catCounts = {};
+  HC.CATEGORIES.forEach(c => catCounts[c] = 0);
+  complaints.forEach(c => { catCounts[c.category] = (catCounts[c.category] || 0) + 1; });
+  const maxCount = Math.max(1, ...Object.values(catCounts));
+  document.getElementById("barChart").innerHTML = Object.entries(catCounts).map(([cat, count]) => `
+    <div class="bar-col">
+      <div class="bar" style="height:${Math.max(4, (count / maxCount) * 140)}px;" title="${cat}: ${count}"></div>
+      <div class="bar-label">${cat.split(" ")[0]}</div>
+    </div>
+  `).join("");
+
+  // Donut chart: status breakdown
+  const statusData = [
+    { label: "Pending", color: "#F59E0B", count: complaints.filter(c => c.status === "Pending").length },
+    { label: "Under Repair", color: "#2563EB", count: complaints.filter(c => c.status === "Under Repair").length },
+    { label: "Completed", color: "#22C55E", count: complaints.filter(c => c.status === "Completed").length },
+  ];
+  const total = Math.max(1, statusData.reduce((s, d) => s + d.count, 0));
+  let cumulative = 0;
+  const donutSvg = document.getElementById("donutSvg");
+  let circles = `<circle cx="21" cy="21" r="15.9" fill="none" stroke="#E2E8F0" stroke-width="6"></circle>`;
+  statusData.forEach(d => {
+    const pct = (d.count / total) * 100;
+    circles += `<circle cx="21" cy="21" r="15.9" fill="none" stroke="${d.color}" stroke-width="6"
+      stroke-dasharray="${pct} ${100 - pct}" stroke-dashoffset="${100 - cumulative}"
+      transform="rotate(-90 21 21)" stroke-linecap="round"></circle>`;
+    cumulative += pct;
+  });
+  donutSvg.innerHTML = circles;
+  document.getElementById("donutLegend").innerHTML = statusData.map(d => `
+    <li>
+      <span class="legend-left"><span class="dot" style="background:${d.color};"></span>${d.label}</span>
+      <span class="legend-right">${d.count}</span>
+    </li>
+  `).join("");
+
+  // Recent complaints table (as cards, consistent across breakpoints for dashboard)
+  const recent = complaints.slice().sort((a,b) => b.createdAt - a.createdAt).slice(0, 5);
+  document.getElementById("recentList").innerHTML = `
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Complaint ID</th><th>Student</th><th>Hostel</th><th>Category</th><th>Date</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${recent.map(c => `
+            <tr>
+              <td class="cell-id">${c.id}</td>
+              <td>${HC.escapeHtml(c.studentName)}</td>
+              <td>${HC.escapeHtml(c.hostel)}</td>
+              <td>${HC.escapeHtml(c.category)}</td>
+              <td>${HC.formatDate(c.createdAt)}</td>
+              <td><span class="badge ${HC.badgeClass(c.status)}">${c.status}</span></td>
+              <td><a href="admin-complaint-details.html?id=${c.id}" class="btn btn-ghost btn-sm">View</a></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById("logoutBtnDesktop").addEventListener("click", () => HC.logout("admin-login.html"));
+  document.getElementById("logoutBtnMobile").addEventListener("click", () => HC.logout("admin-login.html"));
+</script>
+</body>
+</html>

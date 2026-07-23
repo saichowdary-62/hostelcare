@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Complaints · Aditya University</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topnav">
+    <div class="topnav-inner">
+      <div class="brand">
+        <span class="brand-name">Aditya University</span>
+      </div>
+      <nav class="topnav-links">
+        <a href="student-dashboard.html">Home</a>
+        <a href="create-complaint.html">Create Complaint</a>
+        <a href="complaints.html" class="active">My Complaints</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+      <div class="topnav-actions">
+        <button class="avatar-btn" id="avatarBtn" onclick="window.location.href='profile.html'">--</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="section-heading"><h2 style="font-size:20px;">My Complaints</h2></div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by complaint ID, category or room...">
+      </div>
+      <div class="filter-group">
+        <select id="statusFilter">
+          <option value="">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Under Repair">Under Repair</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="complaintList"></div>
+    <div id="emptyState" class="card empty-state" style="display:none;">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <h3>No complaints found</h3>
+      <p>Try adjusting your search or filters.</p>
+    </div>
+  </main>
+
+  <div class="bottom-nav-spacer"></div>
+  <nav class="bottom-nav">
+    <a href="student-dashboard.html">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5H10v5a1 1 0 01-1 1H5a1 1 0 01-1-1v-9z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="create-complaint.html" class="fab-link">
+      <div class="fab-create">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <span>Create</span>
+    </a>
+    <a href="complaints.html" class="active">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Complaints</span>
+    </a>
+    <a href="profile.html">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+</div>
+
+<script src="js/script.js"></script>
+<script>
+  const session = HC.requireStudent();
+  let allComplaints = [];
+
+  if (session) {
+    const student = HC.getStudentById(session.studentId);
+    document.getElementById("avatarBtn").textContent = HC.initials(student.name);
+    allComplaints = HC.getComplaints().filter(c => c.studentId === session.studentId)
+      .sort((a,b) => b.createdAt - a.createdAt);
+
+    const catFilter = document.getElementById("categoryFilter");
+    HC.CATEGORIES.forEach(cat => {
+      const opt = document.createElement("option");
+      opt.value = cat; opt.textContent = cat;
+      catFilter.appendChild(opt);
+    });
+
+    function render() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const status = document.getElementById("statusFilter").value;
+      const category = document.getElementById("categoryFilter").value;
+
+      const filtered = allComplaints.filter(c => {
+        const matchesQ = !q || c.id.toLowerCase().includes(q) || c.category.toLowerCase().includes(q) || c.room.toLowerCase().includes(q);
+        const matchesStatus = !status || c.status === status;
+        const matchesCat = !category || c.category === category;
+        return matchesQ && matchesStatus && matchesCat;
+      });
+
+      const listEl = document.getElementById("complaintList");
+      const emptyEl = document.getElementById("emptyState");
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = "";
+        emptyEl.style.display = "block";
+        return;
+      }
+      emptyEl.style.display = "none";
+      listEl.innerHTML = filtered.map(c => `
+        <div class="complaint-card card-hover" onclick="window.location.href='complaint-details.html?id=${c.id}'">
+          <div class="complaint-card-top">
+            <div>
+              <div class="complaint-card-id">${c.id}</div>
+              <div class="complaint-card-title">${HC.escapeHtml(c.category)}</div>
+            </div>
+            <span class="badge ${HC.badgeClass(c.status)}">${c.status}</span>
+          </div>
+          <div class="complaint-card-meta">
+            <span>Room ${HC.escapeHtml(c.room)}</span>
+            <span>${HC.formatDate(c.createdAt)}</span>
+          </div>
+          <div class="complaint-card-footer">
+            <span class="text-sm text-muted">${HC.escapeHtml(c.description.slice(0, 60))}${c.description.length > 60 ? '…' : ''}</span>
+            <span class="btn btn-ghost btn-sm">View Details</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("searchInput").addEventListener("input", render);
+    document.getElementById("statusFilter").addEventListener("change", render);
+    document.getElementById("categoryFilter").addEventListener("change", render);
+    render();
+  }
+</script>
+</body>
+</html>
