@@ -219,9 +219,15 @@ img { max-width: 100%; display: block; }
 }
 .auth-create-link a { font-weight: 600; }
 .dashboard-create-action {
-  max-width: 260px;
+  display: none;
+  width: min(100%, 300px);
   margin: var(--space-5) auto 0;
   justify-content: center;
+}
+
+/* Keep one clearly aligned create action at each responsive breakpoint. */
+@media (min-width: 900px) {
+  .dashboard-create-action { display: inline-flex; }
 }
 
 .auth-toggle {
@@ -1046,6 +1052,8 @@ img { max-width: 100%; display: block; }
 .text-sm { font-size: 13px; }
 .hide-mobile { display: none; }
 @media (min-width: 720px) { .hide-mobile { display: initial; } }
+.dashboard-create-action.hide-mobile { display: none; }
+@media (min-width: 900px) { .dashboard-create-action.hide-mobile { display: inline-flex; } }
 .hide-desktop { display: initial; }
 @media (min-width: 720px) { .hide-desktop { display: none; } }
 
