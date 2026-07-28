@@ -658,18 +658,24 @@ img { max-width: 100%; display: block; }
 @media (min-width: 900px) { .bottom-nav-spacer { display: none; } }
 
 .fab-create {
-  position: relative;
-  top: -16px;
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 52px; height: 52px;
   border-radius: 50%;
   background: var(--color-primary);
   color: #fff;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 8px 20px rgba(37,99,235,0.35);
-  margin: 0 auto;
 }
-.bottom-nav a.fab-link { flex: 1; }
-.bottom-nav a.fab-link span { display: none; }
+.bottom-nav a.fab-link {
+  flex: 1;
+  justify-content: flex-start;
+  padding-top: 32px;
+  gap: 0;
+}
+.bottom-nav a.fab-link span { display: block; }
 
 /* =========================================================
    Cards / Sections
