@@ -163,19 +163,31 @@ const HC = (() => {
       localStorage.setItem(STORAGE_KEYS.complaints, JSON.stringify(list));
       return complaint;
     }
-    const { data: row, error } = await supabaseClient
+    const complaintData = {
+      student_id: session.authUserId,
+      student_roll: session.studentId,
+      student_name: student.name,
+      hostel: data.hostel, block: data.block, floor: data.floor, room: data.room,
+      category: data.category, description: data.description,
+      image_url: data.image || null,
+      status: "Pending",
+    };
+    let { data: row, error } = await supabaseClient
       .from("complaints")
-      .insert({
-        student_id: session.authUserId,
-        student_roll: session.studentId,
-        student_name: student.name,
-        hostel: data.hostel, block: data.block, floor: data.floor, room: data.room,
-        category: data.category, description: data.description,
-        image_url: data.image || null,
-        status: "Pending",
-      })
+      .insert(complaintData)
       .select("*, complaint_updates(*)")
       .single();
+
+    // Support projects where the optional student_roll/student_name migration
+    // has not yet been applied. The complaint itself can still be submitted.
+    if (error && /student_(roll|name)/i.test(error.message || "")) {
+      const { student_roll, student_name, ...legacyComplaintData } = complaintData;
+      ({ data: row, error } = await supabaseClient
+        .from("complaints")
+        .insert(legacyComplaintData)
+        .select("*, complaint_updates(*)")
+        .single());
+    }
     if (error) throw error;
     // Insert the initial "Pending" audit row.
     await supabaseClient.from("complaint_updates").insert({
