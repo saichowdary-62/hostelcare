@@ -1,7 +1,7 @@
 /* =========================================================
    HostelCare — Core Application Script
-   Handles: data store (localStorage), auth, seeding,
-   shared UI behaviors (nav, ripple, toast, modal).
+   Handles: data store (Supabase + localStorage fallback), auth,
+   seeding, shared UI behaviors (nav, ripple, toast, modal).
    ========================================================= */
 
 const HC = (() => {
@@ -68,23 +68,145 @@ const HC = (() => {
     const mockStudentIds = new Set(["STU2024001", "STU2024002"]);
     const mockComplaintIds = new Set(["HC-1001", "HC-1002", "HC-1003", "HC-1004", "HC-1005", "HC-1006", "HC-1007"]);
     const students = getStudents().filter((student) => !mockStudentIds.has(student.studentId));
-    const complaints = getComplaints().filter((complaint) => !mockComplaintIds.has(complaint.id));
     localStorage.setItem(STORAGE_KEYS.students, JSON.stringify(students));
-    localStorage.setItem(STORAGE_KEYS.complaints, JSON.stringify(complaints));
+    localStorage.setItem(STORAGE_KEYS.complaints, "[]");
   }
 
-  function mkComplaint({ id, studentId, studentName, hostel, block, floor, room, category, description, status, createdAt, image }) {
-    const timeline = [{ status: "Pending", date: createdAt, remark: "Complaint submitted by student." }];
-    if (status === "Under Repair" || status === "Completed") {
-      timeline.push({ status: "Under Repair", date: createdAt + 43200000, remark: "Warden reviewed and assigned to maintenance staff." });
-    }
-    if (status === "Completed") {
-      timeline.push({ status: "Completed", date: createdAt + 129600000, remark: "Repair completed and verified by warden." });
-    }
-    return { id, studentId, studentName, hostel, block, floor, room, category, description, status, createdAt, image: image || null, timeline };
+  /* ---------------- Row shaping ---------------- */
+  // Convert a Supabase complaints row (with joined complaint_updates) into the
+  // shape the rest of the app expects (id as HC-XXXX, timeline array, ms timestamps).
+  function shapeComplaint(row) {
+    const updates = (row.complaint_updates || []).slice().sort((a, b) =>
+      new Date(a.created_at) - new Date(b.created_at));
+    const timeline = updates.length
+      ? updates.map((u) => ({ status: u.status, date: new Date(u.created_at).getTime(), remark: u.remark || "" }))
+      : [{ status: "Pending", date: new Date(row.created_at).getTime(), remark: "Complaint submitted by student." }];
+    return {
+      id: "HC-" + String(row.id).slice(0, 8).toUpperCase(),
+      rawId: row.id,
+      studentId: row.student_roll || row.student_id || "",
+      studentName: row.student_name || "",
+      hostel: row.hostel,
+      block: row.block,
+      floor: row.floor,
+      room: row.room,
+      category: row.category,
+      description: row.description,
+      status: row.status,
+      createdAt: new Date(row.created_at).getTime(),
+      image: row.image_url || null,
+      timeline,
+    };
   }
 
-  /* ---------------- Data Access ---------------- */
+  /* ---------------- Data Access (Supabase) ---------------- */
+  async function fetchComplaints() {
+    if (!supabaseClient) return JSON.parse(localStorage.getItem(STORAGE_KEYS.complaints) || "[]");
+    const { data, error } = await supabaseClient
+      .from("complaints")
+      .select("*, complaint_updates(*)")
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("fetchComplaints error", error);
+      return [];
+    }
+    return data.map(shapeComplaint);
+  }
+
+  async function fetchStudentComplaints(studentId) {
+    if (!supabaseClient) {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.complaints) || "[]")
+        .filter((c) => c.studentId === studentId);
+    }
+    const session = getSession();
+    if (!session || !session.authUserId) return [];
+    const { data, error } = await supabaseClient
+      .from("complaints")
+      .select("*, complaint_updates(*)")
+      .eq("student_id", session.authUserId)
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("fetchStudentComplaints error", error);
+      return [];
+    }
+    return data.map(shapeComplaint);
+  }
+
+  async function fetchComplaintById(rawId) {
+    if (!supabaseClient) return null;
+    const { data, error } = await supabaseClient
+      .from("complaints")
+      .select("*, complaint_updates(*)")
+      .eq("id", rawId)
+      .maybeSingle();
+    if (error || !data) { console.error("fetchComplaintById", error); return null; }
+    return shapeComplaint(data);
+  }
+
+  async function addComplaint(data) {
+    const session = getSession();
+    if (!session || session.role !== "student" || !session.authUserId) {
+      throw new Error("You must be signed in to submit a complaint.");
+    }
+    const student = getStudentById(session.studentId);
+    if (!supabaseClient) {
+      const list = JSON.parse(localStorage.getItem(STORAGE_KEYS.complaints) || "[]");
+      const id = "HC-" + (list.length + 1001);
+      const complaint = {
+        id, studentId: session.studentId, studentName: student.name,
+        hostel: data.hostel, block: data.block, floor: data.floor, room: data.room,
+        category: data.category, description: data.description, status: "Pending",
+        createdAt: Date.now(), image: data.image || null,
+        timeline: [{ status: "Pending", date: Date.now(), remark: "Complaint submitted by student." }],
+      };
+      list.unshift(complaint);
+      localStorage.setItem(STORAGE_KEYS.complaints, JSON.stringify(list));
+      return complaint;
+    }
+    const { data: row, error } = await supabaseClient
+      .from("complaints")
+      .insert({
+        student_id: session.authUserId,
+        student_roll: session.studentId,
+        student_name: student.name,
+        hostel: data.hostel, block: data.block, floor: data.floor, room: data.room,
+        category: data.category, description: data.description,
+        image_url: data.image || null,
+        status: "Pending",
+      })
+      .select("*, complaint_updates(*)")
+      .single();
+    if (error) throw error;
+    // Insert the initial "Pending" audit row.
+    await supabaseClient.from("complaint_updates").insert({
+      complaint_id: row.id, status: "Pending", remark: "Complaint submitted by student.",
+    });
+    return shapeComplaint(row);
+  }
+
+  async function updateComplaintStatus(rawId, newStatus, remark) {
+    if (!supabaseClient) return null;
+    const { error: updErr } = await supabaseClient
+      .from("complaints")
+      .update({ status: newStatus })
+      .eq("id", rawId);
+    if (updErr) { console.error("updateComplaintStatus", updErr); return null; }
+    await supabaseClient.from("complaint_updates").insert({
+      complaint_id: rawId, status: newStatus, remark: remark || defaultRemark(newStatus),
+    });
+    return fetchComplaintById(rawId);
+  }
+
+  function defaultRemark(status) {
+    if (status === "Under Repair") return "Warden assigned this complaint to maintenance staff.";
+    if (status === "Completed") return "Repair completed and verified by warden.";
+    return "Status updated.";
+  }
+
+  /* ---------------- Synchronous wrappers (legacy) ---------------- */
+  // Some pages still call getComplaints() synchronously. We return whatever is
+  // cached in localStorage (updated by the async fetches) so they keep working
+  // while we migrate pages to the async API.
   function getComplaints() {
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.complaints) || "[]");
   }
@@ -96,35 +218,6 @@ const HC = (() => {
   }
   function getStudentById(id) {
     return getStudents().find((s) => s.studentId === id);
-  }
-  function nextComplaintId() {
-    const list = getComplaints();
-    const maxNum = list.reduce((max, c) => {
-      const n = parseInt(String(c.id).replace("HC-", ""), 10);
-      return isNaN(n) ? max : Math.max(max, n);
-    }, 1000);
-    return "HC-" + (maxNum + 1);
-  }
-  function addComplaint(data) {
-    const list = getComplaints();
-    const complaint = mkComplaint({ ...data, id: nextComplaintId(), status: "Pending", createdAt: Date.now() });
-    list.unshift(complaint);
-    saveComplaints(list);
-    return complaint;
-  }
-  function updateComplaintStatus(id, newStatus, remark) {
-    const list = getComplaints();
-    const c = list.find((x) => x.id === id);
-    if (!c) return null;
-    c.status = newStatus;
-    c.timeline.push({ status: newStatus, date: Date.now(), remark: remark || defaultRemark(newStatus) });
-    saveComplaints(list);
-    return c;
-  }
-  function defaultRemark(status) {
-    if (status === "Under Repair") return "Warden assigned this complaint to maintenance staff.";
-    if (status === "Completed") return "Repair completed and verified by warden.";
-    return "Status updated.";
   }
 
   /* ---------------- Auth / Session ---------------- */
@@ -152,11 +245,12 @@ const HC = (() => {
       });
       if (error) return { ok: false, message: error.message };
       const { data: profile, error: profileError } = await supabaseClient
-        .from("profiles").select("*").eq("id", data.user.id).single();
-      if (profileError) return { ok: false, message: "Could not load your student profile." };
+        .from("profiles").select("*").eq("id", data.user.id).maybeSingle();
+      if (profileError || !profile) return { ok: false, message: "Could not load your student profile." };
       const student = {
         studentId: profile.roll_number, name: profile.name, email: profile.email,
-        hostel: profile.hostel || "", block: profile.block || "", floor: profile.floor || "", room: profile.room || "",
+        phone: profile.phone || "", hostel: profile.hostel || "", block: profile.block || "",
+        floor: profile.floor || "", room: profile.room || "",
       };
       localStorage.setItem(STORAGE_KEYS.students, JSON.stringify([student]));
       localStorage.setItem("hc_supabase_enabled", "true");
@@ -178,7 +272,7 @@ const HC = (() => {
     if (error) return { ok: false, message: error.message };
     localStorage.setItem("hc_supabase_enabled", "true");
     if (data.session) {
-      const student = { studentId: rollNumber.trim(), name: name.trim(), email: email.trim(), hostel: "", block: "", floor: "", room: "" };
+      const student = { studentId: rollNumber.trim(), name: name.trim(), email: email.trim(), phone: "", hostel: "", block: "", floor: "", room: "" };
       localStorage.setItem(STORAGE_KEYS.students, JSON.stringify([student]));
       setSession({ role: "student", studentId: student.studentId, authUserId: data.user.id });
       return { ok: true, signedIn: true, message: "Account created successfully." };
@@ -196,6 +290,7 @@ const HC = (() => {
     return { ok: true };
   }
   function logout(redirectTo) {
+    if (supabaseClient) { try { supabaseClient.auth.signOut(); } catch (e) {} }
     clearSession();
     window.location.href = redirectTo || "index.html";
   }
@@ -278,8 +373,9 @@ const HC = (() => {
 
   return {
     STORAGE_KEYS, CATEGORIES, HOSTELS, HOSTEL_BLOCKS, getBlocksForHostel, addHostel, addBlock,
-    seedIfNeeded, removeLegacyMockData, getComplaints, saveComplaints, getStudents, getStudentById,
-    addComplaint, updateComplaintStatus, nextComplaintId,
+    seedIfNeeded, removeLegacyMockData,
+    fetchComplaints, fetchStudentComplaints, fetchComplaintById, addComplaint, updateComplaintStatus,
+    getComplaints, saveComplaints, getStudents, getStudentById,
     getSession, setSession, clearSession, loginStudent, createStudentAccount, loginWarden, logout,
     requireStudent, requireWarden,
     formatDate, formatDateTime, badgeClass, initials, escapeHtml,
@@ -290,7 +386,7 @@ const HC = (() => {
 function initPageLoader() {
   const loader = document.createElement("div");
   loader.className = "page-loader";
-  loader.innerHTML = '<div class="page-loader-spinner" aria-label="Loading"></div><div class="page-loader-text">Loading...</div>';
+  loader.innerHTML = '<div class="page-loader-ring"></div><div class="page-loader-bar"></div><div class="page-loader-text">Loading HostelCare…</div>';
   document.body.prepend(loader);
   window.addEventListener("load", () => {
     loader.classList.add("is-hidden");
