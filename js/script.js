@@ -386,7 +386,7 @@ const HC = (() => {
 function initPageLoader() {
   const loader = document.createElement("div");
   loader.className = "page-loader";
-  loader.innerHTML = '<div class="page-loader-spinner" aria-label="Loading"></div><div class="page-loader-text">Loading...</div>';
+  loader.innerHTML = '<div class="page-loader-logo">H</div><div class="page-loader-bar"></div><div class="page-loader-text">Loading HostelCare…</div>';
   document.body.prepend(loader);
   window.addEventListener("load", () => {
     loader.classList.add("is-hidden");

@@ -90,21 +90,64 @@ img { max-width: 100%; display: block; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 18px;
   background: #f8fafc;
-  transition: opacity 0.28s ease, visibility 0.28s ease;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
 }
 .page-loader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.page-loader-spinner {
-  width: 34px;
-  height: 34px;
-  border: 3px solid #dbeafe;
-  border-top-color: #2563eb;
-  border-radius: 50%;
-  animation: loader-spin 0.75s linear infinite;
+
+.page-loader-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--color-primary), #4F86F7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 22px;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+  animation: loader-pulse 1.4s ease-in-out infinite;
 }
-.page-loader-text { color: #64748b; font-size: 13px; font-weight: 500; }
-@keyframes loader-spin { to { transform: rotate(360deg); } }
+@keyframes loader-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28); }
+  50% { transform: scale(1.08); box-shadow: 0 14px 32px rgba(37, 99, 235, 0.38); }
+}
+
+.page-loader-bar {
+  width: 140px;
+  height: 4px;
+  border-radius: 4px;
+  background: #dbeafe;
+  overflow: hidden;
+  position: relative;
+}
+.page-loader-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-primary), #4F86F7);
+  animation: loader-slide 1.1s ease-in-out infinite;
+}
+@keyframes loader-slide {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
+
+.page-loader-text {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  animation: loader-fade 1.4s ease-in-out infinite;
+}
+@keyframes loader-fade {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
 
 /* Replace this placeholder with the university logo image when available. */
 .brand { display: flex; align-items: center; gap: 9px; }
