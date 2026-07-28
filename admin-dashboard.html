@@ -128,10 +128,14 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/script.js"></script>
 <script>
   HC.requireWarden();
-  const complaints = HC.getComplaints();
+
+  (async () => {
+  const complaints = await HC.fetchComplaints();
 
   document.getElementById("statTotal").textContent = complaints.length;
   document.getElementById("statPending").textContent = complaints.filter(c => c.status === "Pending").length;
@@ -176,7 +180,7 @@
   `).join("");
 
   // Recent complaints table (as cards, consistent across breakpoints for dashboard)
-  const recent = complaints.slice().sort((a,b) => b.createdAt - a.createdAt).slice(0, 5);
+  const recent = complaints.slice(0, 5);
   document.getElementById("recentList").innerHTML = `
     <div class="table-wrap">
       <table class="data-table">
@@ -190,13 +194,14 @@
               <td>${HC.escapeHtml(c.category)}</td>
               <td>${HC.formatDate(c.createdAt)}</td>
               <td><span class="badge ${HC.badgeClass(c.status)}">${c.status}</span></td>
-              <td><a href="admin-complaint-details.html?id=${c.id}" class="btn btn-ghost btn-sm">View</a></td>
+              <td><a href="admin-complaint-details.html?id=${c.rawId}" class="btn btn-ghost btn-sm">View</a></td>
             </tr>
           `).join("")}
         </tbody>
       </table>
     </div>
   `;
+  })();
 
   document.getElementById("logoutBtnDesktop").addEventListener("click", () => HC.logout("admin-login.html"));
   document.getElementById("logoutBtnMobile").addEventListener("click", () => HC.logout("admin-login.html"));

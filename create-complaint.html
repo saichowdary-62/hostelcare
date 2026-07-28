@@ -138,6 +138,8 @@
   </nav>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/script.js"></script>
 <script>
   const session = HC.requireStudent();
@@ -206,7 +208,7 @@
       uploadBox.style.display = "block";
     });
 
-    document.getElementById("complaintForm").addEventListener("submit", (e) => {
+    document.getElementById("complaintForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const category = catSel.value;
       const description = document.getElementById("cDescription").value.trim();
@@ -214,19 +216,28 @@
         HC.toast("Please fill in category and description.");
         return;
       }
-      const complaint = HC.addComplaint({
-        studentId: student.studentId,
-        studentName: student.name,
-        hostel: hostelSel.value,
-        block: document.getElementById("cBlock").value,
-        floor: document.getElementById("cFloor").value,
-        room: document.getElementById("cRoom").value,
-        category, description,
-        image: uploadedImage,
-      });
-      document.getElementById("formView").style.display = "none";
-      document.getElementById("successView").style.display = "block";
-      document.getElementById("successId").textContent = complaint.id;
+      const submitBtn = e.currentTarget.querySelector("button[type=submit]");
+      submitBtn.disabled = true;
+      try {
+        const complaint = await HC.addComplaint({
+          studentId: student.studentId,
+          studentName: student.name,
+          hostel: hostelSel.value,
+          block: document.getElementById("cBlock").value,
+          floor: document.getElementById("cFloor").value,
+          room: document.getElementById("cRoom").value,
+          category, description,
+          image: uploadedImage,
+        });
+        document.getElementById("formView").style.display = "none";
+        document.getElementById("successView").style.display = "block";
+        document.getElementById("successId").textContent = complaint.id;
+      } catch (err) {
+        HC.toast("Could not submit complaint. Please try again.");
+        console.error(err);
+      } finally {
+        submitBtn.disabled = false;
+      }
     });
   }
 </script>

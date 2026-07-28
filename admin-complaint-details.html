@@ -136,13 +136,20 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/script.js"></script>
 <script>
   HC.requireWarden();
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
-  let complaint = HC.getComplaints().find(c => c.id === id);
+  let complaint = null;
   let pendingStatus = null;
+
+  async function loadComplaint() {
+    complaint = await HC.fetchComplaintById(id);
+    renderDetails();
+  }
 
   function renderDetails() {
     if (!complaint) {
@@ -189,8 +196,6 @@
       }
     }
 
-    const stages = ["Pending", "Under Repair", "Completed"];
-    const currentIndex = stages.indexOf(complaint.status);
     document.getElementById("timeline").innerHTML = complaint.timeline.map((t, i) => {
       const isCurrent = i === complaint.timeline.length - 1;
       return `
@@ -215,16 +220,16 @@
 
   document.getElementById("modalCancel").addEventListener("click", closeModal);
   document.getElementById("statusModal").addEventListener("click", (e) => { if (e.target.id === "statusModal") closeModal(); });
-  document.getElementById("modalConfirm").addEventListener("click", () => {
+  document.getElementById("modalConfirm").addEventListener("click", async () => {
     const remark = document.getElementById("remarkInput").value.trim();
-    HC.updateComplaintStatus(complaint.id, pendingStatus, remark || undefined);
-    complaint = HC.getComplaints().find(c => c.id === id);
+    await HC.updateComplaintStatus(complaint.rawId, pendingStatus, remark || undefined);
+    await loadComplaint();
     closeModal();
     HC.toast(`${complaint.id} marked as ${pendingStatus}`);
     renderDetails();
   });
 
-  renderDetails();
+  loadComplaint();
   document.getElementById("logoutBtnDesktop").addEventListener("click", () => HC.logout("admin-login.html"));
   document.getElementById("logoutBtnMobile").addEventListener("click", () => HC.logout("admin-login.html"));
 </script>

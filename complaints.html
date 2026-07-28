@@ -81,6 +81,8 @@
   </nav>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/script.js"></script>
 <script>
   const session = HC.requireStudent();
@@ -89,8 +91,6 @@
   if (session) {
     const student = HC.getStudentById(session.studentId);
     document.getElementById("avatarBtn").textContent = HC.initials(student.name);
-    allComplaints = HC.getComplaints().filter(c => c.studentId === session.studentId)
-      .sort((a,b) => b.createdAt - a.createdAt);
 
     const catFilter = document.getElementById("categoryFilter");
     HC.CATEGORIES.forEach(cat => {
@@ -121,7 +121,7 @@
       }
       emptyEl.style.display = "none";
       listEl.innerHTML = filtered.map(c => `
-        <div class="complaint-card card-hover" onclick="window.location.href='complaint-details.html?id=${c.id}'">
+        <div class="complaint-card card-hover" onclick="window.location.href='complaint-details.html?id=${c.rawId}'">
           <div class="complaint-card-top">
             <div>
               <div class="complaint-card-id">${c.id}</div>
@@ -144,7 +144,11 @@
     document.getElementById("searchInput").addEventListener("input", render);
     document.getElementById("statusFilter").addEventListener("change", render);
     document.getElementById("categoryFilter").addEventListener("change", render);
-    render();
+
+    (async () => {
+      allComplaints = await HC.fetchStudentComplaints(session.studentId);
+      render();
+    })();
   }
 </script>
 </body>

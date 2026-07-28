@@ -115,12 +115,14 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/script.js"></script>
 <script>
   HC.requireWarden();
   const PAGE_SIZE = 6;
   let currentPage = 1;
-  let allComplaints = HC.getComplaints().sort((a,b) => b.createdAt - a.createdAt);
+  let allComplaints = [];
 
   const hostelFilter = document.getElementById("hostelFilter");
   HC.HOSTELS.forEach(h => { const o = document.createElement("option"); o.value = h; o.textContent = h; hostelFilter.appendChild(o); });
@@ -140,12 +142,12 @@
   }
 
   function actionButtons(c) {
-    let html = `<a href="admin-complaint-details.html?id=${c.id}" class="btn btn-ghost btn-sm">View</a>`;
+    let html = `<a href="admin-complaint-details.html?id=${c.rawId}" class="btn btn-ghost btn-sm">View</a>`;
     if (c.status === "Pending") {
-      html += `<button class="btn btn-secondary btn-sm" onclick="quickUpdate('${c.id}','Under Repair')">Mark Under Repair</button>`;
+      html += `<button class="btn btn-secondary btn-sm" onclick="quickUpdate('${c.rawId}','Under Repair')">Mark Under Repair</button>`;
     }
     if (c.status === "Under Repair") {
-      html += `<button class="btn btn-success btn-sm" onclick="quickUpdate('${c.id}','Completed')">Mark Completed</button>`;
+      html += `<button class="btn btn-success btn-sm" onclick="quickUpdate('${c.rawId}','Completed')">Mark Completed</button>`;
     }
     return html;
   }
@@ -218,17 +220,20 @@
   }
 
   function goToPage(p) { currentPage = p; render(); }
-  function quickUpdate(id, status) {
-    HC.updateComplaintStatus(id, status);
-    allComplaints = HC.getComplaints().sort((a,b) => b.createdAt - a.createdAt);
-    HC.toast(`${id} marked as ${status}`);
+  async function quickUpdate(id, status) {
+    await HC.updateComplaintStatus(id, status);
+    allComplaints = await HC.fetchComplaints();
+    HC.toast(`Complaint marked as ${status}`);
     render();
   }
 
   ["searchInput"].forEach(id => document.getElementById(id).addEventListener("input", () => { currentPage = 1; render(); }));
   ["statusFilter", "hostelFilter", "categoryFilter"].forEach(id => document.getElementById(id).addEventListener("change", () => { currentPage = 1; render(); }));
 
-  render();
+  (async () => {
+    allComplaints = await HC.fetchComplaints();
+    render();
+  })();
   document.getElementById("logoutBtnDesktop").addEventListener("click", () => HC.logout("admin-login.html"));
   document.getElementById("logoutBtnMobile").addEventListener("click", () => HC.logout("admin-login.html"));
 </script>

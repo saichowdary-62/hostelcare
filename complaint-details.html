@@ -97,6 +97,8 @@
   </nav>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/script.js"></script>
 <script>
   const session = HC.requireStudent();
@@ -106,16 +108,18 @@
 
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
-    const complaint = HC.getComplaints().find(c => c.id === id && c.studentId === session.studentId);
 
-    if (!complaint) {
-      document.querySelector(".page-content").innerHTML = `
-        <div class="card empty-state">
-          <h3>Complaint not found</h3>
-          <p>This complaint doesn't exist or doesn't belong to your account.</p>
-          <a href="complaints.html" class="btn btn-primary btn-sm">Back to My Complaints</a>
-        </div>`;
-    } else {
+    (async () => {
+      const complaint = await HC.fetchComplaintById(id);
+      if (!complaint || complaint.studentId !== session.studentId) {
+        document.querySelector(".page-content").innerHTML = `
+          <div class="card empty-state">
+            <h3>Complaint not found</h3>
+            <p>This complaint doesn't exist or doesn't belong to your account.</p>
+            <a href="complaints.html" class="btn btn-primary btn-sm">Back to My Complaints</a>
+          </div>`;
+        return;
+      }
       document.getElementById("cId").textContent = complaint.id;
       document.getElementById("cCategory").textContent = complaint.category;
       document.getElementById("cCategory2").textContent = complaint.category;
@@ -149,7 +153,7 @@
           </div>
         `;
       }).join("");
-    }
+    })();
   }
 </script>
 </body>

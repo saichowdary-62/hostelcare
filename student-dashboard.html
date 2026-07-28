@@ -105,15 +105,15 @@
   </nav>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/script.js"></script>
 <script>
   const session = HC.requireStudent();
   if (session) {
     const student = HC.getStudentById(session.studentId);
-    const complaints = HC.getComplaints().filter(c => c.studentId === session.studentId);
 
     document.getElementById("avatarBtn").textContent = HC.initials(student.name);
-
     document.getElementById("welcomeCard").querySelector("h1").textContent = "Welcome back, " + student.name.split(" ")[0] + "!";
     document.getElementById("welcomeMeta").innerHTML = `
       <div><span>Hostel</span><strong>${HC.escapeHtml(student.hostel)}</strong></div>
@@ -121,38 +121,41 @@
       <div><span>Block</span><strong>${HC.escapeHtml(student.block)}</strong></div>
     `;
 
-    document.getElementById("statTotal").textContent = complaints.length;
-    document.getElementById("statPending").textContent = complaints.filter(c => c.status === "Pending").length;
-    document.getElementById("statProgress").textContent = complaints.filter(c => c.status === "Under Repair").length;
-    document.getElementById("statCompleted").textContent = complaints.filter(c => c.status === "Completed").length;
+    (async () => {
+      const complaints = await HC.fetchStudentComplaints(session.studentId);
+      document.getElementById("statTotal").textContent = complaints.length;
+      document.getElementById("statPending").textContent = complaints.filter(c => c.status === "Pending").length;
+      document.getElementById("statProgress").textContent = complaints.filter(c => c.status === "Under Repair").length;
+      document.getElementById("statCompleted").textContent = complaints.filter(c => c.status === "Completed").length;
 
-    const recent = complaints.slice().sort((a,b) => b.createdAt - a.createdAt).slice(0, 3);
-    const recentList = document.getElementById("recentList");
-    if (recent.length === 0) {
-      recentList.innerHTML = `
-        <div class="card empty-state">
-          <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          <h3>No complaints yet</h3>
-          <p>Report your first maintenance issue to get started.</p>
-          <a href="create-complaint.html" class="btn btn-primary btn-sm">Create Complaint</a>
-        </div>`;
-    } else {
-      recentList.innerHTML = recent.map(c => `
-        <div class="complaint-card card-hover" onclick="window.location.href='complaint-details.html?id=${c.id}'">
-          <div class="complaint-card-top">
-            <div>
-              <div class="complaint-card-id">${c.id}</div>
-              <div class="complaint-card-title">${HC.escapeHtml(c.category)}</div>
+      const recent = complaints.slice(0, 3);
+      const recentList = document.getElementById("recentList");
+      if (recent.length === 0) {
+        recentList.innerHTML = `
+          <div class="card empty-state">
+            <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <h3>No complaints yet</h3>
+            <p>Report your first maintenance issue to get started.</p>
+            <a href="create-complaint.html" class="btn btn-primary btn-sm">Create Complaint</a>
+          </div>`;
+      } else {
+        recentList.innerHTML = recent.map(c => `
+          <div class="complaint-card card-hover" onclick="window.location.href='complaint-details.html?id=${c.rawId}'">
+            <div class="complaint-card-top">
+              <div>
+                <div class="complaint-card-id">${c.id}</div>
+                <div class="complaint-card-title">${HC.escapeHtml(c.category)}</div>
+              </div>
+              <span class="badge ${HC.badgeClass(c.status)}">${c.status}</span>
             </div>
-            <span class="badge ${HC.badgeClass(c.status)}">${c.status}</span>
+            <div class="complaint-card-meta">
+              <span>Room ${HC.escapeHtml(c.room)}</span>
+              <span>${HC.formatDate(c.createdAt)}</span>
+            </div>
           </div>
-          <div class="complaint-card-meta">
-            <span>Room ${HC.escapeHtml(c.room)}</span>
-            <span>${HC.formatDate(c.createdAt)}</span>
-          </div>
-        </div>
-      `).join("");
-    }
+        `).join("");
+      }
+    })();
   }
 </script>
 </body>
