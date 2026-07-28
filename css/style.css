@@ -658,22 +658,15 @@ img { max-width: 100%; display: block; }
 @media (min-width: 900px) { .bottom-nav-spacer { display: none; } }
 
 .fab-create {
-  position: absolute;
-  top: -26px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
+  width: 22px;
+  height: 22px;
+  color: inherit;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 20px rgba(37,99,235,0.35);
 }
 .bottom-nav a.fab-link {
   flex: 1;
-  justify-content: flex-start;
-  padding-top: 32px;
-  gap: 0;
+  justify-content: center;
+  gap: 3px;
 }
 .bottom-nav a.fab-link span { display: block; }
 
