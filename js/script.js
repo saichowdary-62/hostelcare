@@ -30,7 +30,9 @@ const HC = (() => {
     window.SUPABASE_URL && !window.SUPABASE_URL.startsWith("YOUR_") &&
     window.SUPABASE_ANON_KEY && !window.SUPABASE_ANON_KEY.startsWith("YOUR_");
   const supabaseClient = isSupabaseConfigured()
-    ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)
+    ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+      })
     : null;
 
   function getBlocksForHostel(hostel) {
@@ -163,10 +165,15 @@ const HC = (() => {
       localStorage.setItem(STORAGE_KEYS.complaints, JSON.stringify(list));
       return complaint;
     }
+    // Ensure the Supabase auth session is restored before the RLS-protected insert.
+    const { data: { session: authSession } } = await supabaseClient.auth.getSession();
+    if (!authSession) {
+      throw new Error("Your session has expired. Please log in again.");
+    }
     const complaintData = {
       student_id: session.authUserId,
       student_roll: session.studentId,
-      student_name: student.name,
+      student_name: student ? student.name : "",
       hostel: data.hostel, block: data.block, floor: data.floor, room: data.room,
       category: data.category, description: data.description,
       image_url: data.image || null,
@@ -190,9 +197,10 @@ const HC = (() => {
     }
     if (error) throw error;
     // Insert the initial "Pending" audit row.
-    await supabaseClient.from("complaint_updates").insert({
+    const { error: auditErr } = await supabaseClient.from("complaint_updates").insert({
       complaint_id: row.id, status: "Pending", remark: "Complaint submitted by student.",
     });
+    if (auditErr) console.error("complaint_updates insert", auditErr);
     return shapeComplaint(row);
   }
 

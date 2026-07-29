@@ -147,8 +147,12 @@
 
   if (session) {
     const student = HC.getStudentById(session.studentId);
-    document.getElementById("avatarBtn").textContent = HC.initials(student.name);
-    document.getElementById("cStudentId").value = student.studentId;
+    if (!student) {
+      HC.toast("Could not load your profile. Please log in again.", "error");
+      HC.logout("index.html");
+    }
+    document.getElementById("avatarBtn").textContent = student ? HC.initials(student.name) : "—";
+    document.getElementById("cStudentId").value = student ? student.studentId : session.studentId;
 
     const hostelSel = document.getElementById("cHostel");
     HC.HOSTELS.forEach(h => {
@@ -233,7 +237,8 @@
         document.getElementById("successView").style.display = "block";
         document.getElementById("successId").textContent = complaint.id;
       } catch (err) {
-        HC.toast("Could not submit complaint. Please try again.");
+        const msg = err && err.message ? err.message : "Could not submit complaint. Please try again.";
+        HC.toast(msg, "error");
         console.error(err);
       } finally {
         submitBtn.disabled = false;
