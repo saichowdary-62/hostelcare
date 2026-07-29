@@ -221,7 +221,11 @@
 
   function goToPage(p) { currentPage = p; render(); }
   async function quickUpdate(id, status) {
-    await HC.updateComplaintStatus(id, status);
+    const result = await HC.updateComplaintStatus(id, status);
+    if (!result.ok) {
+      HC.toast("Update failed: " + (result.error || "Unknown error"), "error");
+      return;
+    }
     allComplaints = await HC.fetchComplaints();
     HC.toast(`Complaint marked as ${status}`);
     render();

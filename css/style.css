@@ -1095,6 +1095,7 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; gap: var(--space-2);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: all; }
+.toast.toast-error { background: #dc2626; }
 @media (min-width: 900px) { .toast { bottom: var(--space-6); } }
 
 /* =========================================================

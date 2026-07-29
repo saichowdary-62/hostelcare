@@ -222,7 +222,11 @@
   document.getElementById("statusModal").addEventListener("click", (e) => { if (e.target.id === "statusModal") closeModal(); });
   document.getElementById("modalConfirm").addEventListener("click", async () => {
     const remark = document.getElementById("remarkInput").value.trim();
-    await HC.updateComplaintStatus(complaint.rawId, pendingStatus, remark || undefined);
+    const result = await HC.updateComplaintStatus(complaint.rawId, pendingStatus, remark || undefined);
+    if (!result.ok) {
+      HC.toast("Update failed: " + (result.error || "Unknown error"), "error");
+      return;
+    }
     await loadComplaint();
     closeModal();
     HC.toast(`${complaint.id} marked as ${pendingStatus}`);

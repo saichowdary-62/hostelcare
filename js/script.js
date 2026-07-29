@@ -197,16 +197,23 @@ const HC = (() => {
   }
 
   async function updateComplaintStatus(rawId, newStatus, remark) {
-    if (!supabaseClient) return null;
+    if (!supabaseClient) return { ok: false, error: "Database not connected." };
     const { error: updErr } = await supabaseClient
       .from("complaints")
       .update({ status: newStatus })
       .eq("id", rawId);
-    if (updErr) { console.error("updateComplaintStatus", updErr); return null; }
-    await supabaseClient.from("complaint_updates").insert({
+    if (updErr) {
+      console.error("updateComplaintStatus update", updErr);
+      return { ok: false, error: updErr.message };
+    }
+    const { error: insErr } = await supabaseClient.from("complaint_updates").insert({
       complaint_id: rawId, status: newStatus, remark: remark || defaultRemark(newStatus),
     });
-    return fetchComplaintById(rawId);
+    if (insErr) {
+      console.error("updateComplaintStatus insert", insErr);
+      return { ok: false, error: insErr.message };
+    }
+    return { ok: true };
   }
 
   function defaultRemark(status) {
@@ -358,7 +365,7 @@ const HC = (() => {
 
   /* ---------------- UI: Toast ---------------- */
   let toastTimer = null;
-  function toast(message) {
+  function toast(message, type) {
     let el = document.querySelector(".toast");
     if (!el) {
       el = document.createElement("div");
@@ -366,6 +373,7 @@ const HC = (() => {
       document.body.appendChild(el);
     }
     el.textContent = message;
+    el.className = "toast" + (type === "error" ? " toast-error" : "");
     el.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
