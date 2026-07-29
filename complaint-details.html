@@ -111,7 +111,7 @@
 
     (async () => {
       const complaint = await HC.fetchComplaintById(id);
-      if (!complaint || complaint.studentId !== session.studentId) {
+      if (!complaint || (complaint.studentId !== session.studentId && complaint.studentId !== session.authUserId)) {
         document.querySelector(".page-content").innerHTML = `
           <div class="card empty-state">
             <h3>Complaint not found</h3>
